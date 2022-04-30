@@ -1,0 +1,60 @@
+version: "3.9"
+
+networks:
+  user_network:
+    name: user_network
+    driver: bridge
+
+volumes:
+  postgres-data: {}
+
+x-user-common: &user-common
+  image: user-service:latest
+  volumes:
+    - .:/code
+  environment: &user-common-env
+    SERVICE_DATABASE_URL: "postgresql://user_sa:p455w0rD@postgres:5432/user_service"
+  networks:
+    - user_network
+  depends_on:
+    - postgres
+  links:
+    - postgres
+
+services:
+  postgres:
+    hostname: postgres
+    image: postgres:13
+    restart: always
+    networks:
+      - user_network
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - ./docs/assets/postgresql/db-init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+      - postgres-data:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  user-service:
+    <<: *user-common
+    command: ["user-cli", "service", "start"]
+    ports:
+      - "1881:1881"
+
+  user-box:
+    <<: *user-common
+    command: ["user-cli"]
+
+  user-box-test:
+    <<: *user-common
+    environment:
+      SERVICE_DATABASE_URL: "postgresql://user_sa:p455w0rD@postgres:5432/user_service_test"
+    command: ["user-cli"]

@@ -1,0 +1,35 @@
+; [flake8]
+; ignore = D100,D101,D102,D203,E203,W503,W504
+; select = E,F,W,C90,I,M
+; exclude =
+;     .git,
+;     node_modules,
+;     migrations,
+;     */migrations/*,
+;     .serverless,
+;     .cached_sls_requirements,
+;     __pycache__,
+;     .cache,
+;     .pytest_cache,
+;     .virtualenv,
+;     .virtualenvs,
+;     */.virtualenv/*,
+;     integration_service_template,
+;     .eggs,
+;     build,
+;     dist,
+;     venv,
+;     lib
+; max-line-length = 120
+[flake8]
+max-line-length = 100
+exclude =
+    .git,
+    .eggs
+    __pycache__,
+    docs/source/conf.py,
+    old,
+    build,
+    venv,
+    migrations,
+ignore=E131,W503,E203
